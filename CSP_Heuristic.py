@@ -1,7 +1,7 @@
 import csv
 import time
 
-COLOR_NUM = 3
+COLOR_NUM = 2
 ASSIGNMENT_NUM = 0
 BACKTRACKING_NUM = 0
 
@@ -16,38 +16,28 @@ class CSP:
 
     def solve(self):
         assignment = {}
-        #print("Starting backtracking...")
         self.solution = self.backtrack(assignment)
-        #print("Finished backtracking.")
         return self.solution
 
     def backtrack(self, assignment):
-
-        #print("Current assignment:", assignment)
         if len(assignment) == len(self.variables):
             return assignment
 
         var = self.select_unassigned_variable(assignment)
-        #print("Selected variable:", var)
         for value in self.order_domain_values(var, assignment):
-            #print("Considering value:", value)
             self.assignment_num += 1
             if self.is_consistent(var, value, assignment):
-                #print("Value is consistent.")
                 assignment[var] = value
                 result = self.backtrack(assignment)
                 if result is not None:
                     return result
-                #print("No solution found with this value. Backtracking...")
                 self.backtrack_num += 1
                 del assignment[var]
-            else:
-                print("Value is not consistent. Trying next value...")
         return None
 
     def select_unassigned_variable(self, assignment):
         unassigned_vars = [var for var in self.variables if var not in assignment]
-        return min(unassigned_vars, key=lambda var: len(self.domains[var]))
+        return max(unassigned_vars, key=lambda var: len(self.constraints.get(var, [])))
 
     def order_domain_values(self, var, assignment):
         return self.domains[var]
@@ -62,12 +52,10 @@ class CSP:
         return True
     
     def assignments(self):
-        assignmnets = self.assignment_num
-        return assignmnets
+        return self.assignment_num
     
     def backtracks(self):
-        backtracks = self.backtrack_num
-        return backtracks
+        return self.backtrack_num
 
 # Read the CSV file
 def read_csv(filename):
@@ -126,4 +114,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
